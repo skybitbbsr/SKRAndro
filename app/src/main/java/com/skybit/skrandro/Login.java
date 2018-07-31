@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -23,7 +22,7 @@ public class Login extends AppCompatActivity {
     EditText password;
     Button signin;
     String result;
-    String[] params = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,43 +55,55 @@ public class Login extends AppCompatActivity {
             ProgressDialog loading;
 
             @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                loading = ProgressDialog.show(Login.this, "Please wait...", null, true, true);
-            }
-
-            @Override
-            protected void onPostExecute(String s) {
-                super.onPostExecute(s);
-
-                if (result == null) {
-                    Toast.makeText(getApplicationContext(), "Network error occured!", Toast.LENGTH_SHORT).show();
-                } else if (result.equals("Login Failed!")) {
-                    Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
-                } else if (result.contains("Success")) {
-                    Intent i = new Intent(Login.this, MainActivity.class);
-                    startActivity(i);
-                } else {
-                    Toast.makeText(Login.this, "Unknown error occurred!", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-
-            @Override
-            protected String doInBackground(String... strings) {
-
+            protected String doInBackground(String... params) {
+                String s = params[0];
                 BufferedReader bufferedReader;
                 try {
-                    URL url = new URL(LOGIN_URL + url_suffix);
+                    URL url = new URL(LOGIN_URL + s);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
                     bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
                     result = bufferedReader.readLine();
                     return result;
 
                 } catch (Exception e) {
+                    e.getMessage();
                     return null;
                 }
             }
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                loading = ProgressDialog.show(Login.this, "Please wait...", null, true, true);
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                super.onPreExecute();
+
+                if (loading.isShowing()) {
+                    loading.dismiss();
+                }
+
+                Toast.makeText(Login.this, result, Toast.LENGTH_SHORT).show();
+
+                if (result == null) {
+                    Toast.makeText(getApplicationContext(), "Network error occured!", Toast.LENGTH_SHORT).show();
+                } else if (result.equals("Fail")) {
+                    Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+                } else if (result.equals("Success")) {
+                    Intent i = new Intent(Login.this, MainActivity.class);
+                    startActivity(i);
+                } else if (result.contains("refused")) {
+                    Toast.makeText(Login.this, "Server refused to connect!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(Login.this, "Nothing happened!", Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+
+
         }
         LoginUser lu = new LoginUser();
         lu.execute(url_suffix);
