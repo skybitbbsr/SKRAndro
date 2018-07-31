@@ -1,7 +1,9 @@
 package com.skybit.skrandro;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -49,7 +51,7 @@ public class Login extends AppCompatActivity {
         login(bus_no, pass);
     }
 
-    private void login(String bus_no, String pass) {
+    private void login(final String bus_no, String pass) {
         final String url_suffix = "?busno=" + bus_no + "&pass=" + pass;
         class LoginUser extends AsyncTask<String, Void, String> {
             ProgressDialog loading;
@@ -92,7 +94,9 @@ public class Login extends AppCompatActivity {
                 } else if (result.equals("Fail")) {
                     Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
                 } else if (result.equals("Success")) {
+                    saveInfo();
                     Intent i = new Intent(Login.this, MainActivity.class);
+                    i.putExtra("busNumber", bus_no);
                     startActivity(i);
                 } else if (result.contains("refused")) {
                     Toast.makeText(Login.this, "Server refused to connect!", Toast.LENGTH_SHORT).show();
@@ -107,5 +111,12 @@ public class Login extends AppCompatActivity {
         }
         LoginUser lu = new LoginUser();
         lu.execute(url_suffix);
+    }
+
+    private void saveInfo() {
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("busnumber", bus_number.getText().toString());
+        editor.apply();
     }
 }

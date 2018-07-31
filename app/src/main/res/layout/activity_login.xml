@@ -71,7 +71,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:paddingTop="5dp"
-                android:text="Forgot Password?" />
+                android:text="Forgot Password?"
+                android:textColor="#FF0000" />
 
 
             <Button
@@ -79,7 +80,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="22dp"
-                android:background="#d67601"
+                android:background="#431fe5"
                 android:text="Sign in"
                 android:textAllCaps="false"
                 android:textColor="#fff"
