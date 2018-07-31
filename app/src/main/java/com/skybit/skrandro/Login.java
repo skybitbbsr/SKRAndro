@@ -18,7 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class Login extends AppCompatActivity {
-    private static final String LOGIN_URL = "localhost/cetbusservice/login.php/";
+    private static final String LOGIN_URL = "http://cetbusservice.000webhostapp.com/login.php/";
     EditText bus_number;
     EditText password;
     Button signin;
@@ -72,6 +72,8 @@ public class Login extends AppCompatActivity {
                 } else if (result.contains("Success")) {
                     Intent i = new Intent(Login.this, MainActivity.class);
                     startActivity(i);
+                } else {
+                    Toast.makeText(Login.this, "Unknown error occurred!", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -79,8 +81,7 @@ public class Login extends AppCompatActivity {
             @Override
             protected String doInBackground(String... strings) {
 
-                String s = params[0];
-                BufferedReader bufferedReader = null;
+                BufferedReader bufferedReader;
                 try {
                     URL url = new URL(LOGIN_URL + url_suffix);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
