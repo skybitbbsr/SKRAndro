@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                     result = bufferedReader.readLine();
                     if (result.equals("Sent")) {
                         ++counter;
-                        textview.setText("Sent Location to Database " + counter + " times");
+                        Toast.makeText(MainActivity.this, "Sent Location to Database " + counter + " times", Toast.LENGTH_SHORT).show();
                     }
 
                 } catch (Exception e) {
@@ -120,6 +120,13 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (button.getText() == "START DRIVING") {
+                    button.setText("STOP DRIVING");
+                } else {
+                    button.setText("START DRIVING");
+                }
+
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                     buildAlertMessageNoGps();

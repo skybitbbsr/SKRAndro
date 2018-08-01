@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -24,13 +25,14 @@ public class Login extends AppCompatActivity {
     EditText password;
     Button signin;
     String result;
-
+    TextView registerBu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        registerBu = (TextView) findViewById(R.id.register_user);
         signin = (Button) findViewById(R.id.signin_button);
         bus_number = (EditText) findViewById(R.id.user_field);
         password = (EditText) findViewById(R.id.password_field);
@@ -40,6 +42,13 @@ public class Login extends AppCompatActivity {
             public void onClick(View v) {
                 loginUser();
 
+            }
+        });
+        registerBu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in = new Intent(Login.this, Register.class);
+                startActivity(in);
             }
         });
     }
@@ -94,10 +103,10 @@ public class Login extends AppCompatActivity {
                 } else if (result.equals("Fail")) {
                     Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
                 } else if (result.equals("Success")) {
-                    saveInfo();
                     Intent i = new Intent(Login.this, MainActivity.class);
                     i.putExtra("busNumber", bus_no);
                     startActivity(i);
+                    finish();
                 } else if (result.contains("refused")) {
                     Toast.makeText(Login.this, "Server refused to connect!", Toast.LENGTH_SHORT).show();
                 } else {
@@ -111,12 +120,5 @@ public class Login extends AppCompatActivity {
         }
         LoginUser lu = new LoginUser();
         lu.execute(url_suffix);
-    }
-
-    private void saveInfo() {
-        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("busnumber", bus_number.getText().toString());
-        editor.apply();
     }
 }
