@@ -9,12 +9,17 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -36,10 +41,13 @@ public class MainActivity extends AppCompatActivity {
     private String busno, result;
     private int counter = 0;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+        setSupportActionBar(toolbar);
 
         button = (Button) findViewById(R.id.share);
         textview = (TextView) findViewById(R.id.text_view_main);
@@ -63,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
                     if (result.equals("Sent")) {
                         ++counter;
                         Toast.makeText(MainActivity.this, "Sent Location to Database " + counter + " times", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Not Sent Location to Database", Toast.LENGTH_SHORT).show();
                     }
 
                 } catch (Exception e) {
@@ -101,6 +111,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings: {
+                // User chose the "Settings" item, show the app settings UI...
+                Intent in = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(in);
+            }
+
+            case R.id.action_check_update: {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("market://details?id=com.skybit.cetbbus.driver"));
+                startActivity(intent);
+            }
+
+            case R.id.action_about: {
+
+            }
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
     private void displayData() {
         Intent i = getIntent(); // gets the previously created intent
         String busno = i.getStringExtra("busNumber");
@@ -121,20 +165,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (button.getText() == "START DRIVING") {
-                    button.setText("STOP DRIVING");
-                } else {
-                    button.setText("START DRIVING");
-                }
-
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                     buildAlertMessageNoGps();
 
                 } else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    if (button.getText() == "START DRIVING") {
+                        button.setText("STOP DRIVING");
+                    }
                     locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
                 }
-
             }
         });
     }

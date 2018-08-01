@@ -7,6 +7,10 @@
     android:background="#5fb0c9"
     tools:context=".MainActivity">
 
+    <include
+        android:id="@+id/app_bar"
+        layout="@layout/app_bar" />
+
     <Button
         android:id="@+id/share"
         android:layout_width="191dp"
@@ -54,9 +58,9 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/share"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.722"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.131" />
+        app:layout_constraintVertical_bias="0.358" />
 
 </android.support.constraint.ConstraintLayout>

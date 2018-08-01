@@ -4,9 +4,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,6 +32,7 @@ public class Login extends AppCompatActivity {
     String result;
     TextView registerBu;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +42,8 @@ public class Login extends AppCompatActivity {
         signin = (Button) findViewById(R.id.signin_button);
         bus_number = (EditText) findViewById(R.id.user_field);
         password = (EditText) findViewById(R.id.password_field);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+        setSupportActionBar(toolbar);
 
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,6 +59,39 @@ public class Login extends AppCompatActivity {
                 startActivity(in);
             }
         });
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings: {
+                // User chose the "Settings" item, show the app settings UI...
+                Intent in = new Intent(Login.this, SettingsActivity.class);
+                startActivity(in);
+            }
+
+            case R.id.action_check_update: {
+                Intent in = new Intent(Intent.ACTION_VIEW);
+                in.setData(Uri.parse("market://details?id=com.skybit.cetbbus.driver"));
+                startActivity(in);
+            }
+
+            case R.id.action_about: {
+            }
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void loginUser() {
