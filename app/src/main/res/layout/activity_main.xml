@@ -11,37 +11,29 @@
         android:id="@+id/app_bar"
         layout="@layout/app_bar" />
 
+    <include
+        android:id="@+id/map"
+        layout="@layout/activity_maps" />
+
     <Button
         android:id="@+id/share"
         android:layout_width="191dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="88dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="492dp"
         android:background="#431fe5"
         android:text="@string/start_driving"
         android:textAllCaps="false"
         android:textColor="#fff"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/text_view_main"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <TextView
-        android:id="@+id/text_view_main"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="248dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:text="@string/details"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintVertical_bias="0.0" />
 
 
     <TextView
@@ -58,9 +50,9 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/share"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.358" />
+        app:layout_constraintTop_toBottomOf="@+id/app_bar"
+        app:layout_constraintVertical_bias="0.002" />
 
 </android.support.constraint.ConstraintLayout>

@@ -82,6 +82,7 @@ public class Register extends AppCompatActivity {
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
                     bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
                     result = bufferedReader.readLine();
+                    con.disconnect();
                     return result;
 
                 } catch (Exception e) {

@@ -10,9 +10,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,6 +26,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
@@ -31,16 +41,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private Button button;
-    private TextView textview, textbusno;
+    private TextView textbusno;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private String URL_SEND = "http://cetbusservice.000webhostapp.com/send_location.php/";
     private String busno, result;
     private int counter = 0;
-
+    private Double lat = 10.0, lng = 10.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,18 +60,24 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         button = (Button) findViewById(R.id.share);
-        textview = (TextView) findViewById(R.id.text_view_main);
         textbusno = (TextView) findViewById(R.id.text_bus_no);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         displayData();
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+
                 BufferedReader bufferedReader;
-                Double lat = location.getLatitude();
-                Double lng = location.getLongitude();
+                lat = location.getLatitude();
+                lng = location.getLongitude();
+
                 String output = "Lattitude: " + lat + "\n" + "Longitude: " + lng;
-                //Toast.makeText(MainActivity.this, output, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, output, Toast.LENGTH_SHORT).show();
                 String s = "?id=" + busno + "&longitude=" + lng + "&latitude=" + lat;
                 try {
                     URL url = new URL(URL_SEND + s);
@@ -74,9 +90,11 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(MainActivity.this, "Not Sent Location to Database", Toast.LENGTH_SHORT).show();
                     }
-
+                    bufferedReader.close();
+                    con.disconnect();
                 } catch (Exception e) {
-                    textview.setText(e.getMessage());
+                    String st = e.toString();
+                    Toast.makeText(MainActivity.this, st, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -109,6 +127,17 @@ public class MainActivity extends AppCompatActivity {
         } else {
             configureButton();
         }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        GoogleMap mMap;
+        mMap = googleMap;
+
+        // Add a marker in Sydney and move the camera
+        LatLng position = new LatLng(lat, lng);
+        mMap.addMarker(new MarkerOptions().position(position).title("Marker in Sydney"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
     }
 
     @Override
@@ -174,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
                         button.setText("STOP DRIVING");
                     }
                     locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
+
                 }
             }
         });
