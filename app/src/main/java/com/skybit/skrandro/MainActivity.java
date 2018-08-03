@@ -134,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         GoogleMap mMap;
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
         LatLng position = new LatLng(lat, lng);
         mMap.addMarker(new MarkerOptions().position(position).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
