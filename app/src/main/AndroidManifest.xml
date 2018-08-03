@@ -16,7 +16,7 @@
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         <activity
             android:name=".MainActivity"
-            android:parentActivityName=".Login"></activity>
+            android:parentActivityName=".Login" />
         <activity android:name=".Login" />
         <activity android:name=".Register" />
         <activity android:name=".SplashActivity">
