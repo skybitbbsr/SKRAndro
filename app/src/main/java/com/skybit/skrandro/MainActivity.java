@@ -1,6 +1,7 @@
 package com.skybit.skrandro;
 
 import android.Manifest;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        toolbar.setTitle("Location here");
 
         locationListener = new LocationListener() {
             @Override
@@ -93,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
                     bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
                     result = bufferedReader.readLine();
+                    Thread.sleep(5000);
                     if (result.equals("Sent")) {
                         ++counter;
                         Toast.makeText(MainActivity.this, "Sent Location to Database " + counter + " times", Toast.LENGTH_SHORT).show();
@@ -238,4 +242,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         final AlertDialog alert = builder.create();
         alert.show();
     }
+
 }

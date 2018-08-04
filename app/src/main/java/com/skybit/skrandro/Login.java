@@ -118,7 +118,9 @@ public class Login extends AppCompatActivity {
                     bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
                     result = bufferedReader.readLine();
                     con.disconnect();
+                    Thread.sleep(5000);
                     return result;
+
 
                 } catch (Exception e) {
                     e.getMessage();
