@@ -71,27 +71,29 @@ public class Login extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        boolean value;
         switch (item.getItemId()) {
-            case R.id.action_settings: {
-                // User chose the "Settings" item, show the app settings UI...
+            case R.id.action_settings:
                 Intent in = new Intent(Login.this, SettingsActivity.class);
                 startActivity(in);
-            }
+                value = true;
+                break;
 
-            case R.id.action_check_update: {
-                Intent in = new Intent(Intent.ACTION_VIEW);
-                in.setData(Uri.parse("market://details?id=com.skybit.cetbbus.driver"));
-                startActivity(in);
-            }
+            case R.id.action_check_update:
+                Intent inc = new Intent(Intent.ACTION_VIEW);
+                inc.setData(Uri.parse("market://details?id=com.skybit.cetbbus.driver"));
+                startActivity(inc);
+                value = true;
+                break;
 
-            case R.id.action_about: {
-            }
+            case R.id.action_about:
+                value = true;
+                break;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
         }
+        return value;
     }
 
     private void loginUser() {
@@ -138,12 +140,10 @@ public class Login extends AppCompatActivity {
                     loading.dismiss();
                 }
 
-                Toast.makeText(Login.this, result, Toast.LENGTH_SHORT).show();
-
                 if (result == null) {
                     Toast.makeText(getApplicationContext(), "Network error occured!", Toast.LENGTH_SHORT).show();
                 } else if (result.equals("Fail")) {
-                    Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Incorrect credentials!", Toast.LENGTH_LONG).show();
                 } else if (result.equals("Success")) {
                     Intent i = new Intent(Login.this, MainActivity.class);
                     i.putExtra("busNumber", bus_no);
@@ -152,7 +152,7 @@ public class Login extends AppCompatActivity {
                 } else if (result.contains("refused")) {
                     Toast.makeText(Login.this, "Server refused to connect!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(Login.this, "Nothing happened!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Login.this, result, Toast.LENGTH_SHORT).show();
                 }
 
 

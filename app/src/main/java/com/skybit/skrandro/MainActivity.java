@@ -27,11 +27,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.w3c.dom.Text;
@@ -50,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String URL_SEND = "http://cetbusservice.000webhostapp.com/send_location.php/";
     private String busno, result;
     private int counter = 0;
+    MarkerOptions mo;
+    GoogleMap mMap;
+    Marker marker;
     private Double lat = 10.0, lng = 10.0;
 
     @Override
@@ -62,8 +67,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         button = (Button) findViewById(R.id.share);
         textbusno = (TextView) findViewById(R.id.text_bus_no);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        mo = new MarkerOptions().position(new LatLng(0, 0)).title("BUS Location");
         displayData();
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -75,6 +80,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 BufferedReader bufferedReader;
                 lat = location.getLatitude();
                 lng = location.getLongitude();
+
+                LatLng myCoordinates = new LatLng(lat, lng);
+                marker.setPosition(myCoordinates);
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
 
                 String output = "Lattitude: " + lat + "\n" + "Longitude: " + lng;
                 Toast.makeText(MainActivity.this, output, Toast.LENGTH_SHORT).show();
@@ -131,12 +140,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        GoogleMap mMap;
-        mMap = googleMap;
 
-        LatLng position = new LatLng(lat, lng);
-        mMap.addMarker(new MarkerOptions().position(position).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+        mMap = googleMap;
+        marker = mMap.addMarker(mo);
+
+        CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(lat, lng));
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo(18);
+
+        mMap.moveCamera(center);
+        mMap.animateCamera(zoom);
     }
 
     @Override
@@ -148,29 +160,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        boolean value;
         switch (item.getItemId()) {
-            case R.id.action_settings: {
-                // User chose the "Settings" item, show the app settings UI...
+            case R.id.action_settings:
                 Intent in = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(in);
-            }
+                value = true;
+                break;
 
-            case R.id.action_check_update: {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("market://details?id=com.skybit.cetbbus.driver"));
-                startActivity(intent);
-            }
+            case R.id.action_check_update:
+                Intent inc = new Intent(Intent.ACTION_VIEW);
+                inc.setData(Uri.parse("market://details?id=com.skybit.cetbbus.driver"));
+                startActivity(inc);
+                value = true;
+                break;
 
-            case R.id.action_about: {
-
-            }
+            case R.id.action_about:
+                value = true;
+                break;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
-
         }
+        return value;
     }
 
     private void displayData() {

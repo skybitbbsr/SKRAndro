@@ -140,28 +140,28 @@ public class Register extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        boolean value;
         switch (item.getItemId()) {
-            case R.id.action_settings: {
-                // User chose the "Settings" item, show the app settings UI...
+            case R.id.action_settings:
                 Intent in = new Intent(Register.this, SettingsActivity.class);
                 startActivity(in);
-            }
+                value = true;
+                break;
 
-            case R.id.action_check_update: {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("market://details?id=com.skybit.cetbbus.driver"));
-                startActivity(intent);
-            }
+            case R.id.action_check_update:
+                Intent inc = new Intent(Intent.ACTION_VIEW);
+                inc.setData(Uri.parse("market://details?id=com.skybit.cetbbus.driver"));
+                startActivity(inc);
+                value = true;
+                break;
 
-            case R.id.action_about: {
-
-            }
+            case R.id.action_about:
+                value = true;
+                break;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
-
         }
+        return value;
     }
 }
