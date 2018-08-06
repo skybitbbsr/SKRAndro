@@ -1,6 +1,7 @@
 package com.skybit.skrandro;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -37,6 +38,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.okhttp.Route;
 
 import org.w3c.dom.Text;
 
@@ -47,15 +49,15 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private Button button;
+    private Button button,button2;
     private TextView textbusno;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private String URL_SEND = "http://cetbusservice.000webhostapp.com/send_location.php/";
     private String busno, result;
-    private int counter = 0;
+    final private int counter = 0;
     MarkerOptions mo;
-    GoogleMap mMap;
+    GoogleMap mMap, mLoc;
     Marker marker;
     private Double lat = 10.0, lng = 10.0;
 
@@ -67,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setSupportActionBar(toolbar);
 
         button = (Button) findViewById(R.id.share);
+        button2 = (Button) findViewById(R.id.share2);
+        button2.setEnabled(false);
         textbusno = (TextView) findViewById(R.id.text_bus_no);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         mo = new MarkerOptions().position(new LatLng(0, 0)).title("BUS Location");
@@ -74,13 +78,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        button2.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                button.setEnabled(true);
+                button2.setEnabled(false);
+                locationManager.removeUpdates(locationListener);
+                Toast.makeText(MainActivity.this, "Reached at College!", Toast.LENGTH_SHORT).show();
+            }
+        });
         toolbar.setTitle("Location here");
+
 
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
 
-                BufferedReader bufferedReader;
                 lat = location.getLatitude();
                 lng = location.getLongitude();
 
@@ -90,26 +104,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 String output = "Lattitude: " + lat + "\n" + "Longitude: " + lng;
                 Toast.makeText(MainActivity.this, output, Toast.LENGTH_SHORT).show();
-                String s = "?id=" + busno + "&longitude=" + lng + "&latitude=" + lat;
-                try {
-                    URL url = new URL(URL_SEND + s);
-                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                    bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                    result = bufferedReader.readLine();
-                    Thread.sleep(5000);
-                    if (result.equals("Sent")) {
-                        ++counter;
-                        Toast.makeText(MainActivity.this, "Sent Location to Database " + counter + " times", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(MainActivity.this, "Not Sent Location to Database", Toast.LENGTH_SHORT).show();
-                    }
-                    bufferedReader.close();
-                    con.disconnect();
-                } catch (Exception e) {
-                    String st = e.toString();
-                    Toast.makeText(MainActivity.this, st, Toast.LENGTH_SHORT).show();
-                }
 
+                class Send extends AsyncTask<String, Void, Void> {
+                    String result;
+                    int c = 0;
+                    @Override
+                    protected Void doInBackground(String... strings) {
+                        try {
+                            BufferedReader bufferedReader;
+                            String s = "?id=" + strings[0] + "&longitude=" + strings[1] + "&latitude=" + strings[2];
+                            URL url = new URL(URL_SEND + s);
+                            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                            bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                            result = bufferedReader.readLine();
+
+                        } catch (Exception e) {
+                            String st = e.toString();
+                            Toast.makeText(MainActivity.this, st, Toast.LENGTH_SHORT).show();
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        if (result.equals("Sent")) {
+                            ++c;
+                            Toast.makeText(MainActivity.this, "Sent Location to Database "+c+" times", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(MainActivity.this, "Not Sent Location to Database", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+                Send send = new Send();
+                send.execute(busno,lng.toString(),lat.toString());
             }
 
             @Override
@@ -148,11 +175,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
         marker = mMap.addMarker(mo);
 
-        CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(lat, lng));
-        CameraUpdate zoom = CameraUpdateFactory.zoomTo(18);
+        LatLng position = new LatLng(lat, lng);
+        mMap.addMarker(new MarkerOptions().position(position).title("Initial"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
 
-        mMap.moveCamera(center);
-        mMap.animateCamera(zoom);
     }
 
     @Override
@@ -191,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void displayData() {
         Intent i = getIntent(); // gets the previously created intent
-        String busno = i.getStringExtra("busNumber");
+        busno = i.getStringExtra("busNumber");
         textbusno.setText("Bus Number: " + busno);
     }
 
@@ -205,23 +231,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void configureButton() {
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        if(button.isEnabled() == true) {
+            button.setOnClickListener(new View.OnClickListener() {
 
-                locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    buildAlertMessageNoGps();
+                @Override
+                public void onClick(View v) {
 
-                } else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    if (button.getText() == "START DRIVING") {
-                        button.setText("STOP DRIVING");
+                    button.setEnabled(false);
+                    button2.setEnabled(true);
+                    locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                    if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                        buildAlertMessageNoGps();
+
+                    } else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                        Toast.makeText(MainActivity.this, "Started from Initial point!", Toast.LENGTH_SHORT).show();
+                        locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
+
                     }
-                    locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
-
                 }
-            }
-        });
+            });
+        }
     }
 
     protected void buildAlertMessageNoGps() {
@@ -243,4 +272,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         alert.show();
     }
 
+
+    protected void stop() {
+
+    }
 }

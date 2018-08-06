@@ -57,6 +57,11 @@ public class Login extends AppCompatActivity {
             public void onClick(View v) {
                 Intent in = new Intent(Login.this, Register.class);
                 startActivity(in);
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -108,6 +113,7 @@ public class Login extends AppCompatActivity {
         class LoginUser extends AsyncTask<String, Void, String> {
             ProgressDialog loading;
 
+
             @Override
             protected String doInBackground(String... params) {
                 String s = params[0];
@@ -118,7 +124,7 @@ public class Login extends AppCompatActivity {
                     bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
                     result = bufferedReader.readLine();
                     con.disconnect();
-                    Thread.sleep(5000);
+                    Thread.sleep(6000);
                     return result;
 
 
